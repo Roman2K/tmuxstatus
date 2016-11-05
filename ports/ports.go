@@ -20,7 +20,7 @@ type Filter interface {
 }
 
 func List(f Filter) ([]int, error) {
-	cmd := exec.Command("lsof", "-l", "-P", "-n", "-i", "TCP", "-s", "TCP:LISTEN")
+	cmd := exec.Command("lsof", "-l", "-P", "-n", "-i", "TCP")
 
 	out, err := cmd.Output()
 	if err != nil {
