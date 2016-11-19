@@ -75,16 +75,12 @@ func cmdCPU() (err error) {
 }
 
 func cmdPorts() (err error) {
-	ports, err := ports.List(
-		ports.Or{
-			ports.Between{8000, 8999},
-			ports.Between{3000, 3999},
-		},
-	)
-
+	ports, err := ports.List([]string{"8000-8999", "3000-3999"})
 	if err != nil {
 		return
 	}
+
+	sort.Ints(ports)
 
 	descs := make([]string, len(ports))
 	for i, port := range ports {
