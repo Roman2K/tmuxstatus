@@ -35,6 +35,8 @@ func List(ranges []string) (ports []int, err error) {
 		}
 	}
 
+	seen := map[int]bool{}
+
 	split := bufio.NewScanner(bytes.NewReader(out))
 	split.Scan() // skip headers
 	for split.Scan() {
@@ -46,6 +48,10 @@ func List(ranges []string) (ports []int, err error) {
 		if err != nil {
 			continue
 		}
+		if _, ok := seen[port]; ok {
+			continue
+		}
+		seen[port] = true
 		ports = append(ports, port)
 	}
 
