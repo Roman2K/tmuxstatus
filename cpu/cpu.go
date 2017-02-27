@@ -21,15 +21,15 @@ func Top(n int) ([]topLine, error) {
 	if err != nil {
 		return nil, err
 	}
-	topLines := []topLine{}
-	curPid := os.Getpid()
-	split := bufio.NewScanner(bytes.NewReader(out))
+	var (
+		split    = bufio.NewScanner(bytes.NewReader(out))
+		topLines = []topLine{}
+		topl     topLine
+		pid      int
+		curPid   = os.Getpid()
+	)
 	split.Scan() // skip headers
 	for split.Scan() {
-		var (
-			topl topLine
-			pid  int
-		)
 		_, err := fmt.Sscanf(split.Text(), "%d %f %s",
 			&pid, &topl.Pct, &topl.Command,
 		)

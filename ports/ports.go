@@ -30,9 +30,11 @@ func List(ranges []string) (ports []int, err error) {
 	if err != nil {
 		return
 	}
-	split := bufio.NewScanner(bytes.NewReader(out))
+	var (
+		split = bufio.NewScanner(bytes.NewReader(out))
+		seen  = map[int]struct{}{}
+	)
 	split.Scan() // skip headers
-	seen := map[int]struct{}{}
 	for split.Scan() {
 		m := listenRe.FindStringSubmatch(split.Text())
 		if m == nil {
