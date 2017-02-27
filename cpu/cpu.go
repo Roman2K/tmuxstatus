@@ -44,12 +44,11 @@ func Top(n int) ([]topLine, error) {
 	if l := len(topLines); n > l {
 		n = l
 	}
-	sort.Sort(byPct(topLines))
+	pct := func(i int) float64 {
+		return topLines[i].Pct
+	}
+	sort.Slice(topLines, func(i, j int) bool {
+		return pct(i) > pct(j)
+	})
 	return topLines[:n], nil
 }
-
-type byPct []topLine
-
-func (s byPct) Len() int           { return len(s) }
-func (s byPct) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s byPct) Less(i, j int) bool { return s[j].Pct < s[i].Pct }
