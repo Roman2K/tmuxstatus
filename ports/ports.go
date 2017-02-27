@@ -18,27 +18,21 @@ func init() {
 
 func List(ranges []string) (ports []int, err error) {
 	args := []string{"-l", "-P", "-n", "-s", "TCP:LISTEN"}
-
 	for _, r := range ranges {
 		args = append(args, "-i", "TCP:"+r)
 	}
 	if len(ranges) == 0 {
 		args = append(args, "-i", "TCP")
 	}
-
 	cmd := exec.Command("lsof", args...)
 	out, err := cmd.Output()
+	err = lsofErr(err)
 	if err != nil {
-		err = makeLsofErr(err)
-		if err != nil {
-			return
-		}
+		return
 	}
-
-	seen := map[int]bool{}
-
 	split := bufio.NewScanner(bytes.NewReader(out))
 	split.Scan() // skip headers
+	seen := map[int]struct{}{}
 	for split.Scan() {
 		m := listenRe.FindStringSubmatch(split.Text())
 		if m == nil {
@@ -51,14 +45,14 @@ func List(ranges []string) (ports []int, err error) {
 		if _, ok := seen[port]; ok {
 			continue
 		}
-		seen[port] = true
+		seen[port] = struct{}{}
 		ports = append(ports, port)
 	}
-
+	err = split.Err()
 	return
 }
 
-func makeLsofErr(err error) error {
+func lsofErr(err error) error {
 	exit, ok := err.(*exec.ExitError)
 	if !ok {
 		return err
