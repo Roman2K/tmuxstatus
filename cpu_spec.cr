@@ -8,8 +8,8 @@ module CPUMethods
 
   macro expose(m)
     # TODO &block
-    def self.{{m}}(*args)
-      CPU.{{m}}(*args)
+    def self.{{m}}(*args, **opts)
+      CPU.{{m}}(*args, **opts)
     end
   end
 

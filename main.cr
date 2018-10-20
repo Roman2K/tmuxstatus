@@ -48,6 +48,8 @@ module CPU
       join(", ")
   end
 
+  record TopLine, pid : UInt32, usage : Float32, cmd : String
+
   private def self.top
     lines = `ps -U #{LibC.getuid} -e -o pid,%cpu,comm`.split "\n"
     $?.success? || raise "ps failed"
@@ -66,13 +68,6 @@ module CPU
       parts[0] = File.basename path
     end
     parts.join " "
-  end
-
-  class TopLine
-    def initialize(@pid, @usage, @cmd)
-    end
-
-    getter pid : UInt32, usage : Float32, cmd : String
   end
 end
 
