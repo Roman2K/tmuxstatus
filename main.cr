@@ -64,7 +64,7 @@ module CPU
 
   protected def self.short(s) : String
     parts = s.split(" ", 2)
-    if (path = parts[0]) && path.includes?('/')
+    if (path = parts[0]).includes?('/')
       parts[0] = File.basename path
     end
     parts.join " "
