@@ -1,5 +1,5 @@
 cmds = {
-  "ports": -> { Ports.print({"8000-8999", "3000-3999"}) },
+  "ports": -> { Ports.print({8000..8999, 3000..3999}) },
   "cpu":   -> { CPU.print 3 },
 }
 
@@ -17,21 +17,11 @@ module Ports
   end
 
   private def self.open(ranges)
-    args = %w(-l -P -n -s TCP:LISTEN) + ranges.flat_map { |r| ["-i", "TCP:"+r] }
-    proc = Process.new "lsof", args: args,
-      output: Process::Redirect::Pipe,
-      error: Process::Redirect::Pipe
-
-    begin
-      outp, err = proc.output.gets_to_end, proc.error.gets_to_end
-    ensure
-      st = proc.wait
-    end
-    st.success? || (st.exit_status == 256 && err == "") \
-      || raise "lsof failed"
-
+    lines = `netstat -tln`.split "\n"
+    $?.success? || raise "netstat failed"
     EnumUtils.
-      grep(outp.split("\n"), /.*:(\d+) \(LISTEN\)/) { |m,| m[1].to_i }.
+      grep(lines, /[\d:]:(\d+) /) { |m,| m[1].to_i }.
+      select { |n| ranges.any? { |r| r.includes? n } }.
       uniq
   end
 end
