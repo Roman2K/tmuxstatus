@@ -34,7 +34,7 @@ module CPU
   def self.print(n, len = 7)
     puts top.
       sort_by { |l| -l.usage }[0,n].
-      map { |line| "%.1f %s" % {line.usage, truncate(short(line.cmd), len)} }.
+      map { |line| "%g %s" % {line.usage, truncate(short(line.cmd), len)} }.
       join(", ")
   end
 
@@ -43,7 +43,7 @@ module CPU
   private def self.top
     lines = `ps -U #{LibC.getuid} -e -o pid,%cpu,comm`.split "\n"
     $?.success? || raise "ps failed"
-    EnumUtils.grep(lines, /^\s*(\d+)\s+(\d+\.\d+)\s+(\S+)\s*$/) do |m,|
+    EnumUtils.grep(lines, /^\s*(\d+)\s+(\d+(?:\.\d+)?)\s+(\S+)\s*$/) do |m,|
       TopLine.new pid: m[1].to_u32, usage: m[2].to_f32, cmd: m[3]
     end
   end
